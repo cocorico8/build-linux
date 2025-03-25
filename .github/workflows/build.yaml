@@ -320,7 +320,7 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.generate-filename.outputs.target_tag }}
+          tag_name: ${{ needs.prepare.outputs.target_tag }}
           name: SPT-Server-Linux ${{ steps.generate-filename.outputs.spt_version }} (${{ steps.generate-filename.outputs.server_commit }})
           files: |
             ../${{ steps.generate-filename.outputs.build_name }}
