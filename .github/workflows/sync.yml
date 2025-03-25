@@ -14,6 +14,8 @@ jobs:
       - name: Sync Fork
         uses: repo-sync/github-sync@v2
         with:
+          source_branch: "main"
+          destination_branch: "tags-sync"
           source_repo: "sp-tarkov/build"
-          sync_tags: "true"
+          sync_tags: "*"
           github_token: ${{ secrets.GITHUB_TOKEN }}
