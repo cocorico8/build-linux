@@ -256,7 +256,7 @@ jobs:
       - name: Clone Build Project
         uses: actions/checkout@v4
         with:
-          repository: cocorico8/build
+          repository: cocorico8/build-linux
           path: build
 
       - name: List Release Contents
