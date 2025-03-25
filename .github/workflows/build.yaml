@@ -167,7 +167,7 @@ jobs:
   build-server:
     needs: prepare
     if: needs.prepare.outputs.proceed == 'true'
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     outputs:
       server_commit: ${{ steps.commit-hash.outputs.server_commit }}
     steps:
