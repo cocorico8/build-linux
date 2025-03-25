@@ -184,7 +184,7 @@ jobs:
       - name: Clone Server
         shell: pwsh
         run: |
-          $serverPath = "$env:GITHUB_WORKSPACE\SPT\Build\server"
+          $serverPath = "$env:GITHUB_WORKSPACE/SPT/Build/server"
           # Delete old remnants of the last build.
           if (Test-Path $serverPath) {
               Remove-Item -Recurse -Force $serverPath
