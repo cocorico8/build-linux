@@ -13,7 +13,7 @@ jobs:
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.BUILD_REPO_ACCESS_TOKEN }}
-          repository: cocorico8/build
+          repository: cocorico8/build-linux
           event-type: build-trigger
           client-payload: |
             {
