@@ -264,7 +264,7 @@ jobs:
           SERVER_COMMIT=${{ needs.build-server.outputs.server_commit }}
           TARGET_TAG=${{ needs.prepare.outputs.target_tag }}
           DATE=$(date +%Y%m%d)
-          PLATFORM=${{needs.build-server.outputs.platform}}
+          PLATFORM=${{ steps.get-platform.outputs.platform }}
 
           if [[ "${{ needs.prepare.outputs.is_nightly }}" == "true" ]]; then
             BASE_NAME="SPT-NIGHTLY-${SPT_VERSION}-${CLIENT_VERSION}-${SERVER_COMMIT}-${DATE}-${PLATFORM}"
