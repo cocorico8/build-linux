@@ -228,14 +228,6 @@ jobs:
         shell: pwsh
         run: npm run build:${{ needs.prepare.outputs.build_type }} -- --arch=x64
         working-directory: ./SPT/Build/server/project
-
-      - name: Upload Server Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: server-artifact
-          path: ./SPT/Build/server/project/build/
-          retention-days: 1
-          if-no-files-found: error
       
       - name: get platform
         id: get-platform
