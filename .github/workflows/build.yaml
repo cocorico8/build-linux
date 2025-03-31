@@ -234,9 +234,9 @@ jobs:
         shell: pwsh
         run: |
           if ($IsWindows) {
-            echo "platform=windows" >> $GITHUB_OUTPUT
+            echo "platform=windows" >> $env:GITHUB_OUTPUT
           } else {
-            echo "platform=linux" >> $GITHUB_OUTPUT
+            echo "platform=linux" >> $env:GITHUB_OUTPUT
           }
 
       - name: Clone Build Project
@@ -253,7 +253,7 @@ jobs:
           BUILD_TYPE=${{ needs.prepare.outputs.build_type }}
           SPT_VERSION=${{ needs.prepare.outputs.spt_version }}
           CLIENT_VERSION=${{ needs.prepare.outputs.client_version }}
-          SERVER_COMMIT=${{ needs.build-server.outputs.server_commit }}
+          SERVER_COMMIT=${{ steps.commit-hash.outputs.server_commit }}
           TARGET_TAG=${{ needs.prepare.outputs.target_tag }}
           DATE=$(date +%Y%m%d)
           PLATFORM=${{ steps.get-platform.outputs.platform }}
