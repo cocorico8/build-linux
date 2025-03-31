@@ -165,11 +165,15 @@ jobs:
           echo "SPT version is $SPT_VERSION"
 
   build-server:
+    strategy:
+      matrix:
+        os: [ "ubuntu-latest" ,"windows-latest" ]
     needs: prepare
     if: needs.prepare.outputs.proceed == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     outputs:
       server_commit: ${{ steps.commit-hash.outputs.server_commit }}
+      platform: ${{ steps.get-platform.outputs.platform }}
     steps:
       - name: Setup Git Target
         shell: pwsh
@@ -222,7 +226,7 @@ jobs:
 
       - name: Build Server
         shell: pwsh
-        run: npm run build:${{ needs.prepare.outputs.build_type }} -- --arch=x64 --platform=linux
+        run: npm run build:${{ needs.prepare.outputs.build_type }} -- --arch=x64
         working-directory: ./SPT/Build/server/project
 
       - name: Upload Server Artifact
@@ -232,6 +236,16 @@ jobs:
           path: ./SPT/Build/server/project/build/
           retention-days: 1
           if-no-files-found: error
+      
+      - name: get platform
+      - id: get-platform
+        shell: pwsh
+        run: |
+          if ($IsWindows) {
+            echo "platform=windows" >> $GITHUB_OUTPUT
+          } else {
+            echo "platform=linux" >> $GITHUB_OUTPUT
+          }
 
   
 
@@ -273,15 +287,16 @@ jobs:
           SERVER_COMMIT=${{ needs.build-server.outputs.server_commit }}
           TARGET_TAG=${{ needs.prepare.outputs.target_tag }}
           DATE=$(date +%Y%m%d)
+          PLATFORM=${{needs.build-server.outputs.platform}}
 
           if [[ "${{ needs.prepare.outputs.is_nightly }}" == "true" ]]; then
-            BASE_NAME="SPT-NIGHTLY-${SPT_VERSION}-${CLIENT_VERSION}-${SERVER_COMMIT}-${DATE}"
+            BASE_NAME="SPT-NIGHTLY-${SPT_VERSION}-${CLIENT_VERSION}-${SERVER_COMMIT}-${DATE}-${PLATFORM}"
           else
             UPPER_BUILD_TYPE=$(echo "$BUILD_TYPE" | tr '[:lower:]' '[:upper:]')
             UPPER_TARGET_TAG=$(echo "$TARGET_TAG" | tr '[:lower:]' '[:upper:]')
 
             if [ "$BUILD_TYPE" = "release" ]; then
-              BASE_NAME="SPT-${SPT_VERSION}-${CLIENT_VERSION}-${SERVER_COMMIT}"
+              BASE_NAME="SPT-${SPT_VERSION}-${CLIENT_VERSION}-${SERVER_COMMIT}-${PLATFORM}"
             else
               TAG_PART=""
               if [[ "$UPPER_TARGET_TAG" == *-*-* ]]; then
@@ -291,9 +306,9 @@ jobs:
                 fi
               fi
               if [ -n "$TAG_PART" ]; then
-                BASE_NAME="SPT-${UPPER_BUILD_TYPE}-${SPT_VERSION}-${CLIENT_VERSION}-${SERVER_COMMIT}${TAG_PART}"
+                BASE_NAME="SPT-${UPPER_BUILD_TYPE}-${SPT_VERSION}-${CLIENT_VERSION}-${SERVER_COMMIT}-${TAG_PART}-${PLATFORM}"
               else
-                BASE_NAME="SPT-${UPPER_BUILD_TYPE}-${SPT_VERSION}-${CLIENT_VERSION}-${SERVER_COMMIT}-${DATE}"
+                BASE_NAME="SPT-${UPPER_BUILD_TYPE}-${SPT_VERSION}-${CLIENT_VERSION}-${SERVER_COMMIT}-${DATE}-${PLATFORM}"
               fi
             fi
           fi
@@ -313,9 +328,6 @@ jobs:
 
           FILE_SIZE_MB=$(stat -c %s "../${{ steps.generate-filename.outputs.build_name }}" | awk '{printf "%.2f MB", $1 / 1024 / 1024}')
           FILE_HASH=$(md5sum "../${{ steps.generate-filename.outputs.build_name }}" | awk '{print $1}' | xxd -r -p | base64)
-
-          echo "file_size_mb=$FILE_SIZE_MB" >> $GITHUB_OUTPUT
-          echo "file_hash=$FILE_HASH" >> $GITHUB_OUTPUT
       
       - name: Create Release
         uses: softprops/action-gh-release@v2
