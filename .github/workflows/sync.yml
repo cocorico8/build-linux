@@ -17,5 +17,5 @@ jobs:
           source_branch: "main"
           destination_branch: "tags-sync"
           source_repo: "sp-tarkov/build"
-          sync_tags: "*"
+          sync_tags: "true"
           github_token: ${{ secrets.GITHUB_TOKEN }}
