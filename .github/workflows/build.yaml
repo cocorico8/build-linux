@@ -238,7 +238,7 @@ jobs:
           if-no-files-found: error
       
       - name: get platform
-      - id: get-platform
+        id: get-platform
         shell: pwsh
         run: |
           if ($IsWindows) {
@@ -246,26 +246,6 @@ jobs:
           } else {
             echo "platform=linux" >> $GITHUB_OUTPUT
           }
-
-  
-
-  assemble-and-publish:
-    needs: [prepare, build-server]
-    runs-on: ubuntu-latest
-    container:
-      image: refringe/spt-build-node:1.1.0
-    steps:
-      - name: Clean Directory
-        shell: bash
-        run: |
-          rm -rf release build
-          mkdir -p release
-
-      - name: Download Server Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: server-artifact
-          path: release/
 
       - name: Clone Build Project
         uses: actions/checkout@v4
@@ -279,6 +259,7 @@ jobs:
 
       - name: Generate Release Filename
         id: generate-filename
+        working-directory: ./SPT/Build/server/project/build
         shell: bash
         run: |
           BUILD_TYPE=${{ needs.prepare.outputs.build_type }}
@@ -320,14 +301,15 @@ jobs:
 
       - name: Compress Release
         id: compress-release
+        working-directory: ./SPT/Build/server/project/build
         shell: bash
         run: |
           cd release
-          7z a -mx=9 -m0=lzma2 "../${{ steps.generate-filename.outputs.build_name }}" ./*
-          echo "Release compressed as ../${{ steps.generate-filename.outputs.build_name }}."
+          7z a -mx=9 -m0=lzma2 "./${{ steps.generate-filename.outputs.build_name }}" ./*
+          echo "Release compressed as ./${{ steps.generate-filename.outputs.build_name }}."
 
-          FILE_SIZE_MB=$(stat -c %s "../${{ steps.generate-filename.outputs.build_name }}" | awk '{printf "%.2f MB", $1 / 1024 / 1024}')
-          FILE_HASH=$(md5sum "../${{ steps.generate-filename.outputs.build_name }}" | awk '{print $1}' | xxd -r -p | base64)
+          FILE_SIZE_MB=$(stat -c %s "./${{ steps.generate-filename.outputs.build_name }}" | awk '{printf "%.2f MB", $1 / 1024 / 1024}')
+          FILE_HASH=$(md5sum "./${{ steps.generate-filename.outputs.build_name }}" | awk '{print $1}' | xxd -r -p | base64)
       
       - name: Create Release
         uses: softprops/action-gh-release@v2
