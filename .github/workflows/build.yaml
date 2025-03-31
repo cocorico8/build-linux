@@ -253,10 +253,6 @@ jobs:
           repository: cocorico8/build-linux
           path: build
 
-      - name: List Release Contents
-        shell: bash
-        run: tree release
-
       - name: Generate Release Filename
         id: generate-filename
         working-directory: ./SPT/Build/server/project/build
