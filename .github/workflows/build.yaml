@@ -300,6 +300,7 @@ jobs:
       
       - name: Create Release
         uses: softprops/action-gh-release@v2
+        working-directory: ./SPT/Build/server/project/build
         with:
           tag_name: ${{ needs.prepare.outputs.target_tag }}
           name: SPT-Server-Linux ${{ needs.prepare.outputs.spt_version }} (${{ needs.build-server.outputs.server_commit }})
