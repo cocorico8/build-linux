@@ -300,7 +300,6 @@ jobs:
         working-directory: ./SPT/Build/server/project/build
         shell: bash
         run: |
-          cd release
           7z a -mx=9 -m0=lzma2 "./${{ steps.generate-filename.outputs.build_name }}" ./*
           echo "Release compressed as ./${{ steps.generate-filename.outputs.build_name }}."
 
